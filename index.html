@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Si Chantik Qepri (Sistem Channel Interaktif Karantina Kepulauan Riau) - Chat Fullpage</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/geist-font/1.0.0/fonts/geist-sans/style.min.css">
+  <title>Si Chantik Qepri - Chat Fullpage</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/geist-font/1.0.0/fonts-geist-sans/style.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     body {
@@ -16,8 +16,6 @@
       display: flex;
       flex-direction: column;
     }
-
-    /* Header */
     #chat-header {
       background: #3B1C0A;
       color: white;
@@ -33,11 +31,9 @@
     #chat-header-title {
       display: flex;
       align-items: center;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
     }
-
-    /* Body */
     #chat-body {
       flex: 1;
       padding: 16px;
@@ -83,8 +79,6 @@
       50% { opacity: 1; }
       100% { opacity: 0.3; }
     }
-
-    /* Footer */
     #chat-footer {
       padding: 12px;
       border-top: 1px solid #ddd;
@@ -118,13 +112,12 @@
   <div id="chat-header">
     <div id="chat-header-title">
       <img src="https://upload.wikimedia.org/wikipedia/id/thumb/5/53/Logo_Barantin.svg/2048px-Logo_Barantin.svg.png" alt="Logo Barantin">
-      <span>Si Chantik Kepri</span>
+      <span>Si Chantik Qepri - Sistem Channel Interaktif Layanan Karantina Kepulauan Riau</span>
     </div>
   </div>
 
   <!-- Body -->
   <div id="chat-body">
-    <!-- Pesan pembuka -->
     <div class="chat-bubble bot-msg">
       <p><strong>Halo! 👋</strong><br>
       Saya <b>Si Chantik Pelayanan Karantina</b>, asisten digital yang siap membantu Anda dengan informasi terkait regulasi karantina.</p>
@@ -145,26 +138,25 @@
       }
     };
 
-    // session baru setiap reload
     const chatId = "chat_" + Math.random().toString(36).substr(2, 9);
 
     function getTime() {
       return new Date().toLocaleString("id-ID", { hour: "2-digit", minute: "2-digit" });
     }
 
-    document.getElementById("chat-send").addEventListener("click", function() {
+    function sendMessage() {
       let message = document.getElementById("chat-input").value;
       if (message.trim() === "") return;
 
       let chatBody = document.getElementById("chat-body");
 
-      // Pesan user
+      // tampilkan pesan user
       let userBubble = document.createElement("div");
       userBubble.className = "chat-bubble user-msg";
       userBubble.innerHTML = `<p>${message}</p><span class="timestamp">${getTime()}</span>`;
       chatBody.appendChild(userBubble);
 
-      // Typing indicator
+      // indikator mengetik
       let typingBubble = document.createElement("div");
       typingBubble.className = "typing-indicator";
       typingBubble.textContent = "Si Chantik sedang mengetik...";
@@ -180,11 +172,16 @@
           route: window.ChatWidgetConfig.webhook.route
         })
       })
-      .then(response => response.json())
+      .then(async (response) => {
+        try {
+          return await response.json();
+        } catch {
+          return { output: "⚠️ Respon bukan JSON valid dari server." };
+        }
+      })
       .then(data => {
         chatBody.removeChild(typingBubble);
 
-        // Pesan bot
         let botBubble = document.createElement("div");
         botBubble.className = "chat-bubble bot-msg";
         botBubble.innerHTML = `
@@ -200,8 +197,20 @@
       });
 
       document.getElementById("chat-input").value = "";
+    }
+
+    // klik tombol
+    document.getElementById("chat-send").addEventListener("click", sendMessage);
+
+    // tekan Enter
+    document.getElementById("chat-input").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendMessage();
+      }
     });
   </script>
 
 </body>
 </html>
+
