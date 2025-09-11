@@ -16,6 +16,8 @@
       display: flex;
       flex-direction: column;
     }
+
+    /* Header */
     #chat-header {
       background: #3B1C0A;
       color: white;
@@ -34,18 +36,38 @@
       font-size: 16px;
       font-weight: bold;
     }
+    #chat-header-title span {
+      line-height: 1.4;
+    }
+
+    /* Body */
     #chat-body {
       flex: 1;
       padding: 16px;
       overflow-y: auto;
-      background: #fff;
+      background: #fff url("https://upload.wikimedia.org/wikipedia/id/thumb/5/53/Logo_Barantin.svg/2048px-Logo_Barantin.svg.png") no-repeat center center;
+      background-size: contain; /* biar logo menyesuaikan tinggi/lebarnya */
+      position: relative;
     }
+
+    /* Transparansi logo */
+    #chat-body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.6); /* overlay putih 60% agar logo terlihat samar */
+      pointer-events: none;
+    }
+
+    /* bubble */
     .chat-bubble {
       margin-bottom: 12px;
       padding: 10px;
       border-radius: 8px;
       font-size: 14px;
       max-width: 75%;
+      position: relative;
+      z-index: 1; /* pastikan bubble di atas overlay */
     }
     .user-msg {
       background: #f1f1f1;
@@ -73,12 +95,16 @@
       font-size: 12px;
       margin-top: 10px;
       animation: blink 1.5s infinite;
+      z-index: 1;
+      position: relative;
     }
     @keyframes blink {
       0% { opacity: 0.3; }
       50% { opacity: 1; }
       100% { opacity: 0.3; }
     }
+
+    /* Footer */
     #chat-footer {
       padding: 12px;
       border-top: 1px solid #ddd;
@@ -120,7 +146,8 @@
   <div id="chat-body">
     <div class="chat-bubble bot-msg">
       <p><strong>Halo! 👋</strong><br>
-      Saya <b>Si Chantik Pelayanan Karantina</b>, asisten digital yang siap membantu Anda dengan informasi terkait regulasi karantina.</p>
+      Saya <b>Si Chantik Pelayanan Karantina</b>, asisten digital yang siap membantu Anda dengan informasi terkait regulasi karantina hewan, ikan dan tumbuhan. 
+      <p><strong>Silahkan Sapa saya untuk memulai percakapan!<b><p><strong></p>
     </div>
   </div>
 
@@ -150,7 +177,7 @@
 
       let chatBody = document.getElementById("chat-body");
 
-      // tampilkan pesan user
+      // pesan user
       let userBubble = document.createElement("div");
       userBubble.className = "chat-bubble user-msg";
       userBubble.innerHTML = `<p>${message}</p><span class="timestamp">${getTime()}</span>`;
@@ -185,7 +212,7 @@
         let botBubble = document.createElement("div");
         botBubble.className = "chat-bubble bot-msg";
         botBubble.innerHTML = `
-          <div>${marked.parse(data.output || "Maaf, saya belum bisa menjawab itu.")}</div>
+          <div>${marked.parse(data.output || "Maaf, saya belum bisa menjawab itu. Silahkan Hubungi petugas karantina terdekat!")}</div>
           <span class="timestamp">${getTime()}</span>
         `;
         chatBody.appendChild(botBubble);
@@ -199,10 +226,7 @@
       document.getElementById("chat-input").value = "";
     }
 
-    // klik tombol
     document.getElementById("chat-send").addEventListener("click", sendMessage);
-
-    // tekan Enter
     document.getElementById("chat-input").addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -213,4 +237,3 @@
 
 </body>
 </html>
-
