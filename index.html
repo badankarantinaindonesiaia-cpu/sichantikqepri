@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Si Chantik Qepri - Chat Fullpage</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/geist-font/1.0.0/fonts-geist-sans/style.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/geist-font/1.0.0/fonts/geist-sans/style.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     body {
@@ -36,9 +36,6 @@
       font-size: 16px;
       font-weight: bold;
     }
-    #chat-header-title span {
-      line-height: 1.4;
-    }
 
     /* Body */
     #chat-body {
@@ -46,16 +43,15 @@
       padding: 16px;
       overflow-y: auto;
       background: #fff url("https://upload.wikimedia.org/wikipedia/id/thumb/5/53/Logo_Barantin.svg/2048px-Logo_Barantin.svg.png") no-repeat center center;
-      background-size: contain; /* biar logo menyesuaikan tinggi/lebarnya */
+      background-size: contain;
       position: relative;
     }
-
-    /* Transparansi logo */
+    /* Overlay putih supaya logo jadi pudar */
     #chat-body::before {
       content: "";
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255, 255, 255, 0.6); /* overlay putih 60% agar logo terlihat samar */
+      background: rgba(255, 255, 255, 0.65); /* 65% putih → logo hanya 35% terlihat */
       pointer-events: none;
     }
 
@@ -67,7 +63,7 @@
       font-size: 14px;
       max-width: 75%;
       position: relative;
-      z-index: 1; /* pastikan bubble di atas overlay */
+      z-index: 1;
     }
     .user-msg {
       background: #f1f1f1;
@@ -118,6 +114,10 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       outline: none;
+      resize: none;
+      min-height: 40px;
+      max-height: 120px;
+      overflow-y: auto;
     }
     #chat-send {
       background: #3B1C0A;
@@ -146,14 +146,14 @@
   <div id="chat-body">
     <div class="chat-bubble bot-msg">
       <p><strong>Halo! 👋</strong><br>
-      Saya <b>Si Chantik Pelayanan Karantina</b>, asisten digital yang siap membantu Anda dengan informasi terkait regulasi karantina hewan, ikan dan tumbuhan. 
-      <p><strong>Silahkan Sapa saya untuk memulai percakapan!<b><p><strong></p>
+      Saya <b>Si Chantik Pelayanan Karantina</b>, asisten digital yang siap membantu Anda dengan informasi terkait regulasi karantina hewan, ikan dan tumbuhan.
+<p><strong>Silahkan Sapa saya untuk memulai percakapan!.</p>
     </div>
   </div>
 
   <!-- Footer -->
   <div id="chat-footer">
-    <input type="text" id="chat-input" placeholder="Tulis pesan Anda...">
+    <textarea id="chat-input" placeholder="Tulis pesan Anda..."></textarea>
     <button id="chat-send">Kirim</button>
   </div>
 
@@ -171,8 +171,16 @@
       return new Date().toLocaleString("id-ID", { hour: "2-digit", minute: "2-digit" });
     }
 
+    const textarea = document.getElementById("chat-input");
+
+    // auto resize textarea
+    textarea.addEventListener("input", function() {
+      this.style.height = "auto";
+      this.style.height = Math.min(this.scrollHeight, 120) + "px"; // max 120px
+    });
+
     function sendMessage() {
-      let message = document.getElementById("chat-input").value;
+      let message = textarea.value;
       if (message.trim() === "") return;
 
       let chatBody = document.getElementById("chat-body");
@@ -180,7 +188,7 @@
       // pesan user
       let userBubble = document.createElement("div");
       userBubble.className = "chat-bubble user-msg";
-      userBubble.innerHTML = `<p>${message}</p><span class="timestamp">${getTime()}</span>`;
+      userBubble.innerHTML = `<p>${message.replace(/\n/g, "<br>")}</p><span class="timestamp">${getTime()}</span>`;
       chatBody.appendChild(userBubble);
 
       // indikator mengetik
@@ -212,7 +220,7 @@
         let botBubble = document.createElement("div");
         botBubble.className = "chat-bubble bot-msg";
         botBubble.innerHTML = `
-          <div>${marked.parse(data.output || "Maaf, saya belum bisa menjawab itu. Silahkan Hubungi petugas karantina terdekat!")}</div>
+          <div>${marked.parse(data.output || "Maaf, saya belum bisa menjawab itu.")}</div>
           <span class="timestamp">${getTime()}</span>
         `;
         chatBody.appendChild(botBubble);
@@ -223,16 +231,11 @@
         console.error("Error:", error);
       });
 
-      document.getElementById("chat-input").value = "";
+      textarea.value = "";
+      textarea.style.height = "40px";
     }
 
     document.getElementById("chat-send").addEventListener("click", sendMessage);
-    document.getElementById("chat-input").addEventListener("keypress", function(e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
   </script>
 
 </body>
