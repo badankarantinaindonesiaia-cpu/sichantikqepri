@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Si Chantik Qepri - Chat Fullpage</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/geist-font/1.0.0/fonts/geist-sans/style.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/geist-font/1.0.0/fonts-geist-sans/style.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     body {
@@ -46,12 +46,11 @@
       background-size: contain;
       position: relative;
     }
-    /* Overlay putih supaya logo jadi pudar */
     #chat-body::before {
       content: "";
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255, 255, 255, 0.65); /* 65% putih → logo hanya 35% terlihat */
+      background: rgba(255, 255, 255, 0.65); /* logo pudar */
       pointer-events: none;
     }
 
@@ -146,8 +145,8 @@
   <div id="chat-body">
     <div class="chat-bubble bot-msg">
       <p><strong>Halo! 👋</strong><br>
-      Saya <b>Si Chantik Pelayanan Karantina</b>, asisten digital yang siap membantu Anda dengan informasi terkait regulasi karantina hewan, ikan dan tumbuhan.
-<p><strong>Silahkan Sapa saya untuk memulai percakapan!.</p>
+      Saya <b>Si Chantik Pelayanan Karantina</b>, asisten digital yang siap membantu Anda dengan informasi terkait regulasi karantina hewan, ikan dan tumbuhan.</p>
+      <p><strong>Silahkan Sapa saya untuk memulai percakapan!.</strong></p>
     </div>
   </div>
 
@@ -158,14 +157,16 @@
   </div>
 
   <script>
+    // Session ID unik per reload page
+    const sessionId = "session_" + Math.random().toString(36).substring(2, 10);
+
     window.ChatWidgetConfig = {
       webhook: {
-        url: 'https://n8n-dzlbphakiwsd.budi.sumopod.my.id/webhook/0cf95efc-39cf-4d06-aeb7-391c17012f02/chat',
-        route: 'general'
-      }
+        url: "https://n8n-dzlbphakiwsd.budi.sumopod.my.id/webhook/0cf95efc-39cf-4d06-aeb7-391c17012f02/chat",
+        route: "general"
+      },
+      sessionId: sessionId
     };
-
-    const chatId = "chat_" + Math.random().toString(36).substr(2, 9);
 
     function getTime() {
       return new Date().toLocaleString("id-ID", { hour: "2-digit", minute: "2-digit" });
@@ -176,7 +177,7 @@
     // auto resize textarea
     textarea.addEventListener("input", function() {
       this.style.height = "auto";
-      this.style.height = Math.min(this.scrollHeight, 120) + "px"; // max 120px
+      this.style.height = Math.min(this.scrollHeight, 120) + "px";
     });
 
     function sendMessage() {
@@ -202,7 +203,7 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          chatId: chatId,
+          sessionId: window.ChatWidgetConfig.sessionId,   // kirim sessionId
           chatInput: message,
           route: window.ChatWidgetConfig.webhook.route
         })
